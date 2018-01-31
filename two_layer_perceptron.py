@@ -26,6 +26,7 @@ def softmax(z): # z = (n,k)
 def linear_model(W, b, X):
 	return X.dot(W) + b
 
+#numerically check if the analytical gradient calculated is correct upto an order of lr/100 
 def numerical_first_layer_bw(X, W1, b1, W2, b2, y):
 	eps = 0.01
 	W1[0, 1] += eps
