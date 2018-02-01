@@ -19,6 +19,12 @@ def sigmoid(z):
 def sigmoid_prime(g_z):
 	return g_z*(1-g_z)
 
+def relu(z):
+	return np.maximum(0, z)
+
+def relu_prime(z):
+	return 0 if z<=0 else z
+
 def softmax(z): # z = (n,k)
 	return (np.exp(z).T/np.sum(np.exp(z), axis=1)).T
 
