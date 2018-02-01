@@ -23,7 +23,15 @@ def relu(z):
 	return np.maximum(0, z)
 
 def relu_prime(z):
-	return 0 if z<=0 else z
+	z_prime = np.zeros_like(z)
+	z_prime[z>0] = 1
+	return z_prime
+
+def funny_tanh(z):
+	return 1.7159*np.tanh(2.*z/3)
+
+def funny_tanh_prime(z):
+	return 1.7159*2/(3*np.cosh(2.*z/3))
 
 def softmax(z): # z = (n,k)
 	return (np.exp(z).T/np.sum(np.exp(z), axis=1)).T
@@ -111,6 +119,8 @@ def one_hot_vector(y):
 def normalize_data(X):
 	X = np.true_divide(X, 127.5)
 	X -= 1
+	X[np.where(X<=0)] = 0
+	X[np.where(X>0)] = 1
 	return X
 
 def get_mnist_data():
