@@ -18,41 +18,18 @@ USE_CUDA = torch.cuda.is_available()
 
 # ========================== Model constants ===============================
 N_CLASSES = 10
-N_EPOCHS = 50
+N_EPOCHS = 225
 LR = 0.001
-BATCH_SIZE = 64
-VALID_SIZE = 0.
+BATCH_SIZE = 128
+VALID_SIZE = 0.1
 
 # ======================= Loading the data =============================
-# def get_data(filename):
-# 	with open(filename, mode='rb') as file:
-# 		data = pickle.load(file)
+transform = transforms.Compose([
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-# 	raw_images = data[b'data']
-# 	cls = np.array(data[b'labels'])
-# 	images = raw_images.reshape([-1, 3, 32, 32])
-# 	return images, cls
-
-# def load_training_data():
-#     images = np.zeros(shape=[50000, 3, 32, 32], dtype=float)
-#     cls = np.zeros(shape=[50000], dtype=int)
-
-#     begin = 0
-#     for i in range(5):
-#         images_batch, cls_batch = get_data(filename="./cifar-10-batches-py/cifar-10-batches-py/data_batch_" + str(i + 1))
-#         num_images = len(images_batch)
-#         end = begin + num_images
-#         images[begin:end, :] = images_batch
-#         cls[begin:end] = cls_batch
-#         begin = end
-
-#     images = preprocess(images, cls)
-#     plt.imsave('olo.png', images[0].transpose([1, 2, 0]))
-#     print images.shape
-#     return (images, cls)
-transform = transforms.Compose(
-    [transforms.ToTensor()])
-     # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 trainset = torchvision.datasets.CIFAR10(root='cifar-10-batches-py/', train=True,
                                         download=True, transform=transform)
 
@@ -87,18 +64,6 @@ classes = ['plane', 'car', 'bird', 'cat',
 
 
 # =========================== Data handling ================================
-def preprocess(X, y):
-	processed_X = np.zeros_like(X)
-	for class_id in range(N_CLASSES):
-		ids = y[np.where(y)==class_id]
-		class_X = X[ids].copy()
-		class_X -= np.mean(class_X, axis=1)
-		class_X -= np.mean(class_X, axis=2)
-		# class_X /= np.std(class_X)
-		processed_X[ids] = class_X
-
-	return processed_X
-
 def make_one_hot(y):
 	one_hot = np.zeros((y.shape[0], N_CLASSES))
 	one_hot[np.range(y.shape[0]), y] = 1
@@ -175,8 +140,6 @@ accs = []
 for epoch in range(N_EPOCHS):
 	for iteratn, data in enumerate(trainloader):
 		X, y = data
-		plt.imsave('olo.png', X[0].numpy().transpose([1, 2, 0]))
-		exit()
 		if USE_CUDA:
 			X, y = Variable(X.cuda()), Variable(y.cuda())
 		else:
@@ -203,3 +166,5 @@ for data in testloader:
     correct += (predicted == y).sum()
 
 print 'Accuracy of the network on the 10000 test images:', correct*1.0/total
+
+torch.save(model.state_dict(), 'model_'+str(correct*1.0/total)+'_epochs'+str(N_EPOCHS)) # 81.75% test accuracy
