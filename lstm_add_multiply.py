@@ -31,7 +31,7 @@ def get_next_batch():
 
 def xavier_weights(shape, name):
 	if len(shape)==2:
-		N = shape[0]+shape[1]/2.0
+		N = (shape[0]+shape[1])/2.0
 	else:
 		N = shape[0]
 
